@@ -2,6 +2,7 @@ import "../WebCrumbs.css";
 import { GetDay } from "./day";
 import { EventType } from "../event";
 import { useState } from "react";
+import { isRegularEventOnDate, getNextRegularEventDate } from "../../utils/regularityUtils";
 
 const getMonthName = (i: number) => {
   switch (i) {
@@ -98,20 +99,39 @@ const getCalDay = (mmonth: number, yyear: number, Events: EventType[], setShowDa
         : yyear > new Date().getFullYear();
 
     const str = getStrDate(dday, mmonth+1, yyear);
+    const currentDate = new Date(yyear, mmonth, dday);
+    
+    // Фильтруем события для этого дня
     const eve = Events.filter(e => {
+      // Обычные события
       if (e.Attributes.DateStart === str) return true;
 
-      if (e.Type === "regular") {
-        const diff = daysBetween(e.Attributes.DateStart, str);
-        return diff >= 0 && diff % Number(e.Attributes.Regularity) === 0;
+      // Регулярные события
+      if (e.Attributes.Regularity) {
+        return isRegularEventOnDate(e.Attributes.DateStart || '', e.Attributes.Regularity, currentDate);
       }
 
-      if (e.Type === "interval") {
-        return isDateInRange(str, e.Attributes.DateStart, String(e.Attributes.DateEnd));
+      // Интервальные события
+      if (e.Attributes.Interval && e.Attributes.DateStart && e.Attributes.DateEnd) {
+        return isDateInRange(str, e.Attributes.DateStart, e.Attributes.DateEnd);
       }
 
       return false;
-    });
+    }).map(event => {
+      // Для регулярных событий показываем только ближайшее к текущей дате
+      if (event.Attributes.Regularity) {
+        const nextDate = getNextRegularEventDate(event.Attributes.DateStart || '', event.Attributes.Regularity, new Date());
+        if (nextDate) {
+          const nextDateStr = getStrDate(nextDate.getDate(), nextDate.getMonth() + 1, nextDate.getFullYear());
+          // Показываем событие только если это ближайшее вхождение
+          if (nextDateStr === str) {
+            return event;
+          }
+        }
+        return null;
+      }
+      return event;
+    }).filter((event): event is EventType => event !== null);
 
     elements.push(
   <GetDay 
@@ -209,20 +229,38 @@ act = false;
 			const dayStr = daysFormatted[ii];
 
 			const dayEvents = Events.filter(e => {
+				// Обычные события
 				if (e.Attributes.DateStart === dayStr) return true;
 
-				if (e.Type === "regular") {
-				const diff = daysBetween(e.Attributes.DateStart, dayStr);
-				//console.log("====", daysFormatted[ii]);
-				return diff >= 0 && diff % Number(e.Attributes.Regularity) === 0;
+				// Регулярные события
+				if (e.Attributes.Regularity) {
+					const currentDate = new Date();
+					const [day, month, year] = dayStr.split('-').map(Number);
+					currentDate.setFullYear(year < 100 ? 2000 + year : year, month - 1, day);
+					return isRegularEventOnDate(e.Attributes.DateStart || '', e.Attributes.Regularity, currentDate);
 				}
 
-				if (e.Type === "interval") {
-				return isDateInRange(dayStr, e.Attributes.DateStart, String(e.Attributes.DateEnd));
+				// Интервальные события
+				if (e.Attributes.Interval && e.Attributes.DateStart && e.Attributes.DateEnd) {
+					return isDateInRange(dayStr, e.Attributes.DateStart, e.Attributes.DateEnd);
 				}
 
 				return false;
-			});
+			}).map(event => {
+				// Для регулярных событий показываем только ближайшее к текущей дате
+				if (event.Attributes.Regularity) {
+					const nextDate = getNextRegularEventDate(event.Attributes.DateStart || '', event.Attributes.Regularity, new Date());
+					if (nextDate) {
+						const nextDateStr = getStrDate(nextDate.getDate(), nextDate.getMonth() + 1, nextDate.getFullYear());
+						// Показываем событие только если это ближайшее вхождение
+						if (nextDateStr === dayStr) {
+							return event;
+						}
+					}
+					return null;
+				}
+				return event;
+			}).filter((event): event is EventType => event !== null);
 
 			
 			return (

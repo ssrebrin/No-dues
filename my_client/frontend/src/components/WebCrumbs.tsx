@@ -20,15 +20,16 @@ export const Component = () => {
   const Name = "Max";
   const [eventsStr, setEventsStr] = useState<string>("[]");
 
+  const fetchEvents = async () => {
+    try {
+      const result = await GetURLData(Name);
+      setEventsStr(result);
+    } catch (err) {
+      console.error("Ошибка получения данных:", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const result = await GetURLData(Name);
-        setEventsStr(result);
-      } catch (err) {
-        console.error("Ошибка получения данных:", err);
-      }
-    };
     fetchEvents();
   }, [Name]);
 
@@ -55,7 +56,7 @@ export const Component = () => {
 return (
   <div id="webcrumbs" className="relative">
     <div className="flex flex-col md:flex-row p-4 gap-6 h-screen bg-gray-50 relative z-0">
-      <Tabler Events={Events}  setShowAddEvent={setShowAddEvent} showAddEvent={showAddEvent} showDay={showDay} key={showDay}/>
+      <Tabler Events={Events}  setShowAddEvent={setShowAddEvent} showAddEvent={showAddEvent} showDay={showDay} key={showDay} refreshEvents={fetchEvents}/>
       <Calendar Events={Events} setShowAddEvent={setShowAddEvent} setShowDay={setShowDay}/>
       {/*<Panel/>*/}
     </div>

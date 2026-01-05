@@ -18,8 +18,8 @@
 .tooltip-container .tooltip {
   position: absolute;
   bottom: 100%;
-  right: 50%;
-  transform: translateX(50%);
+  left: 50%;
+  transform: translateX(-50%);
   margin-bottom: 4px;
   width: 192px;
   background: white;
@@ -31,6 +31,9 @@
   transition: opacity 0.2s;
   pointer-events: none;
   z-index: 20;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tooltip-container:hover .tooltip {

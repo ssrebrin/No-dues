@@ -37,9 +37,10 @@ function todayISO(): string {
 interface AddEventProps {
   onClose: () => void;
   start?: string; // необязательный пропс
+  refreshEvents?: () => Promise<void>;
 }
 
-export const AddEvent: React.FC<AddEventProps> = ({ onClose, start = "" }) => {
+export const AddEvent: React.FC<AddEventProps> = ({ onClose, start = "", refreshEvents }) => {
   //const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState(start === ""?todayISO():convertDate(start));
@@ -48,7 +49,8 @@ export const AddEvent: React.FC<AddEventProps> = ({ onClose, start = "" }) => {
   const [endTime, setEndTime] = useState("");
   const [eventType, setEventType] = useState("single"); // single | regular | interval
   const [category, setCategory] = useState("");
-  const [regularity, setRegularity] = useState("1"); // дни
+  const [regularity, setRegularity] = useState("1"); // в минутах
+  const [regularityType, setRegularityType] = useState("minutes"); // minutes | hours | days | weeks | months | years
   const [location, setLocation] = useState("");
   const [error, setError] = useState("");
   const [color, setColor] = useState("#f173ffff");
@@ -67,12 +69,12 @@ export const AddEvent: React.FC<AddEventProps> = ({ onClose, start = "" }) => {
       setError("Start date is required");
       return;
     }
-    if (eventType === "interval" && (!endDate || endDate < startDate)) {
+    if (eventType === "interval" && endDate && endDate < startDate) {
       setError("End date must be after start date");
       return;
     }
-    if (eventType === "regular" && (!regularity)) {
-      setError("End date must be after start date");
+    if (eventType === "regular" && (!regularity || !regularityType)) {
+      setError("Regularity settings are required");
       return;
     }
 console.log(startDate);
@@ -87,7 +89,7 @@ console.log(startDate);
       DateStart: formattedStartDate,
       DateEnd: formattedEndDate,
       Location: location,
-      Regularity: eventType === "regular" ? regularity : undefined,
+      Regularity: eventType === "regular" ? `${regularityType}:${regularity}` : undefined,
       BgColor: color,
       LegendMark: category,
       Interval: eventType === "interval" ? `${formattedStartDate} - ${formattedEndDate}` : undefined,
@@ -103,6 +105,9 @@ console.log(startDate);
 
     try {
       await PostURLData(event);
+      if (refreshEvents) {
+        await refreshEvents();
+      }
       onClose();
     } catch (err) {
       console.error(err);
@@ -204,21 +209,40 @@ console.log(startDate);
       onChange={(e) => setEventType(e.target.value)}
       className="rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-primary-400 focus:border-primary-400 outline-none transition"
     >
-      <option value="event">Event</option>
+      <option value="single">Single Event</option>
+      <option value="regular">Regular Event</option>
+      <option value="interval">Interval Event</option>
       <option value="task">Task</option>
     </select>
 
     {eventType === "regular" && (
-      <select
-        value={regularity}
-        onChange={(e) => setRegularity(e.target.value)}
-        className="rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-primary-400 focus:border-primary-400 outline-none transition"
-      >
-        <option value="1">Daily</option>
-        <option value="7">Weekly</option>
-        <option value="30">Monthly</option>
-        <option value="365">Yearly</option>
-      </select>
+      <div className="space-y-4">
+        <div className="flex gap-4">
+          <select
+            value={regularityType}
+            onChange={(e) => setRegularityType(e.target.value)}
+            className="rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-primary-400 focus:border-primary-400 outline-none transition"
+          >
+            <option value="minutes">Minutes</option>
+            <option value="hours">Hours</option>
+            <option value="days">Days</option>
+            <option value="weeks">Weeks</option>
+            <option value="months">Months</option>
+            <option value="years">Years</option>
+          </select>
+          <input
+            type="number"
+            min="1"
+            value={regularity}
+            onChange={(e) => setRegularity(e.target.value)}
+            placeholder="Interval"
+            className="rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-primary-400 focus:border-primary-400 outline-none transition w-24"
+          />
+        </div>
+        <div className="text-sm text-gray-600">
+          Repeats every {regularity} {regularityType}
+        </div>
+      </div>
     )}
 
     <input

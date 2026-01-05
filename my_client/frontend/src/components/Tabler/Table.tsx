@@ -6,11 +6,22 @@ import { ShowSubtasks } from "./subtask/subtasks";
 
 export function toLightColor(color: string, opacity = 0.06): string {
   if (color.startsWith("#")) {
-    const bigint = parseInt(color.slice(1), 16);
-    const r = (bigint >> 24) & 255;
-    const g = (bigint >> 16) & 255;
-    const b = (bigint >> 8) & 255;
-    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    // Handle 8-digit hex colors (with alpha)
+    if (color.length === 9) {
+      const bigint = parseInt(color.slice(1, 9), 16);
+      const r = (bigint >> 24) & 255;
+      const g = (bigint >> 16) & 255;
+      const b = (bigint >> 8) & 255;
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+    // Handle 6-digit hex colors
+    else if (color.length === 7) {
+      const bigint = parseInt(color.slice(1), 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
   }
   if (color.startsWith("rgb")) {
     const nums = color.match(/\d+/g);
@@ -92,6 +103,7 @@ export const Table:React.FC<tableProps> = ({ ev, numEdit, del, setDel, setNumEdi
 
       {/* Описание */}
       <p className="text-gray-600 mt-2 text-left w-full">{ev.Description}</p>
+      
         <ShowSubtasks id={Number(ev.ID)} numEdit={numEdit} del = {del} setDel={setDel}  setNumEdit={setNumEdit}/>
       {/* Нижняя строка: время/локация слева, тип события справа */}
       <div className="flex justify-between items-center mt-3 text-sm text-gray-500">

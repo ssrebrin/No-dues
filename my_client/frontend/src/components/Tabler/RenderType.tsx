@@ -3,7 +3,7 @@ import { EventType } from "../event";
 
 export const renderEventType = (Event: EventType) => {
   switch (Event.Type) {
-    case "task":
+    case "regular":
       return (
         <div className="flex items-center m-1">
           <span className="material-symbols-outlined text-lg mr-1">event_repeat</span>

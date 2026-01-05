@@ -2,6 +2,7 @@
 import "./day.css"
 import "../WebCrumbs.css";
 import { EventType } from "../event";
+import { formatRegularity } from "../../utils/regularityUtils";
 
 function parseDate(str: string): Date {
 	//console.log(str);
@@ -65,12 +66,11 @@ return (
       )}
     </div>
 
-    {/* Контейнер для точек */}
-    {Events.length > 0 && (
-      <div className="absolute bottom-2 right-2 flex flex-col gap-1 pointer-events-none">
-        {Events.map(ev => (
-          ((!(ev.Type === "event")) && intMode === "point") &&
-          <div key={`circle-${ev.ID}`} className="tooltip-container">
+    {/* Контейнер для точек - горизонтальное расположение */}
+    {Events.length > 0 && intMode === "point" && (
+      <div className="absolute bottom-2 left-1 right-1 flex gap-1 pointer-events-none overflow-hidden">
+        {Events.slice(0, 3).map((ev, index) => (
+          <div key={`circle-${ev.ID}`} className="tooltip-container flex-shrink-0">
             {/* Точка */}
             <div 
               className="dot"
@@ -80,17 +80,31 @@ return (
             <div className="tooltip">
               <p className="font-medium text-blue-700">{ev.Attributes.Name}</p>
               <p className="text-gray-600 mt-1">{ev.Description}</p>
+              {/* Регулярность */}
+              {ev.Attributes.Regularity && (
+                <p className="text-blue-500 mt-1 flex items-center">
+                  <span className="material-symbols-outlined text-xs mr-1">
+                    repeat
+                  </span>
+                  {formatRegularity(ev.Attributes.Regularity)}
+                </p>
+              )}
+              {/* Тип события */}
               <p className="text-gray-500 mt-1 flex items-center">
                 <span className="material-symbols-outlined text-xs mr-1">
-                  calendar_today
+                  {ev.Attributes.Regularity ? "event_repeat" : "calendar_today"}
                 </span>
-                {ev.Type === "regularity"
-                  ? `Regular (${ev.Attributes.Regularity})`
-                  : ev.Type}
+                {ev.Attributes.Regularity ? "Regular Event" : ev.Type || "Event"}
               </p>
             </div>
           </div>
         ))}
+        {/* Индикатор если событий больше 3 */}
+        {Events.length > 3 && (
+          <div className="flex-shrink-0 text-xs text-gray-500 flex items-center justify-center w-4 h-4 bg-gray-100 rounded-full">
+            +{Events.length - 3}
+          </div>
+        )}
       </div>
     )}
 
