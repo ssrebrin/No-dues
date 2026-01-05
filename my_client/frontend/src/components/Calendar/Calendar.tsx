@@ -227,7 +227,8 @@ act = false;
 			
 			return (
   <GetDay 
-  setShowDay={setShowDay}
+    key={ii}
+    setShowDay={setShowDay}
     i={dayNumber} 
     Events={dayEvents} 
     Today={dayStr} 

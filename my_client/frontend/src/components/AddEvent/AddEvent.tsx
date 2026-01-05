@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { PostURLData } from "../../../wailsjs/go/main/App";
-import { main } from "../../../wailsjs/go/models";
+import { PostURLData, EventAttributes, Event } from "../../api/client";
 import "../WebCrumbs.css";
 import "./ev.css";
 import { ColorPicker } from "./ColorSelect";
@@ -81,7 +80,7 @@ console.log(startDate);
     const formattedStartDate = formatDate(startDate);
     const formattedEndDate = endDate ? formatDate(endDate) : undefined;
 
-    const attrs: main.EventAttributes = {
+    const attrs: EventAttributes = {
       Name: category,
       TimeStart: startTime,
       TimeEnd: endTime || undefined,
@@ -95,13 +94,11 @@ console.log(startDate);
       DetachOnCal: undefined,
     };
 
-    const event: main.Event = {
+    const event: Event = {
       name: "Max",
       event_type: eventType,
       description,
       event_attributes: attrs,
-      // временный convertValues (если нужно обойти TS-ошибку)
-      convertValues: (a: any, c: any) => a,
     };
 
     try {

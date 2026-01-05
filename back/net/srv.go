@@ -18,6 +18,7 @@ import (
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 )
 
 type Server struct {
@@ -58,6 +59,16 @@ func (s *Server) Init(ctx context.Context) error {
 	s.log.Debug("logger debug mode enabled")
 
 	router := chi.NewRouter()
+
+	// CORS middleware
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://127.0.0.1:3000", "http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}))
 
 	router.Use(middleware.RequestID) // Добавляет request_id в каждый запрос, для трейсинга
 	router.Use(middleware.Logger)    // Логирование всех запросов

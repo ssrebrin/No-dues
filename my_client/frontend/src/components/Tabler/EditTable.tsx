@@ -2,7 +2,7 @@ import { useState } from "react";
 import "../WebCrumbs.css";
 import { renderEventType } from "./RenderType";
 import { EventType } from "../event";
-import { UpdateEvent } from "../../../wailsjs/go/main/App";
+import { UpdateEvent } from "../../api/client";
 
 type UpdateField = { field: string; newVal: string };
 

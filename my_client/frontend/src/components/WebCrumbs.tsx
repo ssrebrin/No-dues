@@ -4,7 +4,7 @@ import "./WebCrumbs.css";
 import {Loginn} from "./login/login"
 import { Tabler } from "./Tabler/Tabler";
 import { Calendar } from "./Calendar/Calendar";
-import { GetURLData } from "../../wailsjs/go/main/App";
+import { GetURLData } from "../api/client";
 import { EventType } from "./event";
 import { AddEvent } from "./AddEvent/AddEvent";
 import ReactDOM from "react-dom";

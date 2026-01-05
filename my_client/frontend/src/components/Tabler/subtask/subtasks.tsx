@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { DeleteST, GetSubtask, UpdateSubtask } from "../../../../wailsjs/go/main/App";
+import { DeleteST, GetSubtask, UpdateSubtask } from "../../../api/client";
 import { InputWithCheck } from "./STEditor";
 import '../../../style.css';
 

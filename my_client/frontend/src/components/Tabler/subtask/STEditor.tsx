@@ -1,17 +1,11 @@
 import React, { useState } from "react";
-import { PostSubtask } from "../../../../wailsjs/go/main/App";
+import { PostSubtask, Subtask } from "../../../api/client";
 
 interface InputWithCheckProps {
   val: string;
   id: number;
   setNumEdit: React.Dispatch<React.SetStateAction<number>>;
   refresh: () => void;
-}
-
-type Subtask = {
-  event_id: number;
-  name: string;
-  state: string;
 }
 
 export const InputWithCheck: React.FC<InputWithCheckProps> = ({ val, id, setNumEdit, refresh }) => {

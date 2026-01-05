@@ -2,9 +2,7 @@ import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, useState }
 import "../WebCrumbs.css";
 import { renderEventType } from "./RenderType";
 import { EventType } from "../event";
-import { DeleteURLData } from "../../../wailsjs/go/main/App";
 import { ShowSubtasks } from "./subtask/subtasks";
-import { main } from "../../../wailsjs/go/models";
 
 export function toLightColor(color: string, opacity = 0.06): string {
   if (color.startsWith("#")) {

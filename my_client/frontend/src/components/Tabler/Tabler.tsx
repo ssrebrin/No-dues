@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { DeleteURLData } from "../../../wailsjs/go/main/App";
+import { DeleteURLData } from "../../api/client";
 import "../WebCrumbs.css";
 import { renderEventType } from "./RenderType";
 import { Table } from "./Table";
